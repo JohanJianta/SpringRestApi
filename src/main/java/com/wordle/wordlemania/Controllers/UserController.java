@@ -1,0 +1,165 @@
+package com.wordle.wordlemania.Controllers;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.Errors;
+import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.wordle.wordlemania.Entity.User;
+import com.wordle.wordlemania.Services.UserService;
+import com.wordle.wordlemania.dto.ResponseData;
+import com.wordle.wordlemania.dto.UserResponseData;
+import com.wordle.wordlemania.dto.UserRequest;
+
+import jakarta.validation.Valid;
+
+@RestController
+@RequestMapping(path = "/Player")
+public class UserController {
+
+    @Autowired
+    private UserService userService;
+
+    public UserResponseData getUser(int idPlayer) {
+        return userService.getUserData(idPlayer);
+    }
+
+    @GetMapping("/{idPlayer}")
+    public ResponseEntity<ResponseData<UserResponseData>> findUser(@PathVariable(value = "idPlayer") int id) {
+        Optional<User> userOptional = userService.getUserById(id);
+        ResponseData<UserResponseData> responseData = new ResponseData<>();
+
+        if (userOptional.isPresent()) {
+            responseData.setStatus(true);
+            responseData.setPayload(userService.getUserData(id));
+            return ResponseEntity.ok().body(responseData);
+        } else {
+            responseData.setStatus(false);
+            responseData.setPayload(null);
+            responseData.getMessages().add("Player Not Found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseData);
+        }
+    }
+
+    @GetMapping("/Leaderboard")
+    public ResponseEntity<ResponseData<List<UserResponseData>>> findTopPlayer() {
+        ResponseData<List<UserResponseData>> responseData = new ResponseData<>();
+        responseData.setStatus(true);
+        responseData.setPayload(userService.getTopPlayers());
+        return ResponseEntity.ok().body(responseData);
+    }
+
+    // ambil info satu player
+    @PostMapping("/Login")
+    public ResponseEntity<ResponseData<Integer>> authenticateUser(@Valid @RequestBody UserRequest userRequest,
+            Errors errors) {
+        ResponseData<Integer> responseData = new ResponseData<>();
+        int playerId;
+
+        if (errors.hasErrors()) {
+            for (ObjectError error : errors.getAllErrors()) {
+                responseData.getMessages().add(error.getDefaultMessage());
+            }
+            responseData.setStatus(false);
+            responseData.setPayload(null);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseData);
+        } else if ((playerId = userService.loginUser(userRequest.getEmail(), userRequest.getPassword())) != 0) {
+            responseData.setStatus(true);
+            responseData.setPayload(playerId);
+            responseData.getMessages().add("Authentication Success!");
+            return ResponseEntity.ok().body(responseData);
+        } else {
+            responseData.setStatus(false);
+            responseData.setPayload(null);
+            responseData.getMessages().add("Incorrect Email or Password");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseData);
+        }
+
+    }
+
+    // buat satu player
+    @PostMapping("/Register")
+    public ResponseEntity<ResponseData<String>> createUser(@Valid @RequestBody UserRequest userRequest,
+            Errors errors) {
+
+        ResponseData<String> responseData = new ResponseData<>();
+
+        if (errors.hasErrors()) {
+            for (ObjectError error : errors.getAllErrors()) {
+                responseData.getMessages().add(error.getDefaultMessage());
+            }
+            responseData.setStatus(false);
+            responseData.setPayload(null);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseData);
+        } else if (userService.getUserByEmail(userRequest.getEmail()).isPresent()) {
+            responseData.setStatus(false);
+            responseData.setPayload(null);
+            responseData.getMessages()
+                    .add(String.format("The email you used already linked to another account", userRequest.getEmail()));
+            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(responseData);
+        } else {
+            responseData.setStatus(true);
+            responseData.setPayload(null);
+            responseData.getMessages().add(userService.registerUser(userRequest));
+            return ResponseEntity.ok(responseData);
+        }
+    }
+
+    // update info satu player
+    @PutMapping("/{idPlayer}")
+    public ResponseEntity<ResponseData<UserResponseData>> updateUser(@PathVariable(value = "idPlayer") int id,
+            @Valid @RequestBody UserResponseData userResponseData, Errors errors) {
+        ResponseData<UserResponseData> responseData = new ResponseData<>();
+        Optional<User> userOptional = userService.getUserById(id);
+
+        if (userOptional.isPresent()) {
+
+            if (errors.hasErrors()) {
+                for (ObjectError error : errors.getAllErrors()) {
+                    responseData.getMessages().add(error.getDefaultMessage());
+                }
+                responseData.setStatus(false);
+                responseData.setPayload(null);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseData);
+            } else {
+                responseData.setStatus(true);
+                responseData.setPayload(userService.update(userResponseData, userOptional.get()));
+                responseData.getMessages().add("Player's data updated");
+                return ResponseEntity.ok(responseData);
+            }
+
+        } else {
+            responseData.setStatus(false);
+            responseData.setPayload(null);
+            responseData.getMessages().add("Player Not Found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseData);
+        }
+    }
+
+    // hapus satu player
+    @DeleteMapping("/{idPlayer}")
+    public ResponseEntity<String> deleteUser(@PathVariable(value = "idPlayer") int id) {
+        Optional<User> userOptional = userService.getUserById(id);
+
+        if (userOptional.isPresent()) {
+            userService.delete(id);
+
+            return ResponseEntity.ok("Player succesfully deleted");
+        } else {
+            return ResponseEntity.status(HttpStatusCode.valueOf(404)).body("Error: Player Not Found");
+        }
+    }
+}
