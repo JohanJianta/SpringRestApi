@@ -1,6 +1,5 @@
 package com.wordle.wordlemania.Entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.wordle.wordlemania.Model.FriendRequestId;
 import com.wordle.wordlemania.Model.FriendStatus;
 
@@ -36,9 +35,9 @@ public class FriendRequest {
     @JoinColumn(name = "sender_id", insertable=false, updatable = false)
     private User sender;
 
+    // @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "receiver_id", insertable=false, updatable = false)
-    @JsonIgnore
     private User receiver;
 
 }

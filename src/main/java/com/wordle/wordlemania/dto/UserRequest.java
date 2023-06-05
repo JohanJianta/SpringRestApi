@@ -13,6 +13,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserRequest {
+    private int guestId;
+
     @Size(max = 255)
     private String name;
 

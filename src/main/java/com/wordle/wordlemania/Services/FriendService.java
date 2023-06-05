@@ -44,7 +44,7 @@ public class FriendService {
         for (FriendRequest friendRequest : friendRequests) {
             FriendRequestData friendRequestData = new FriendRequestData();
             friendRequestData.setId(friendRequest.getId().getSenderId());
-            friendRequestData.setFriendName(friendRequest.getSender().getName());
+            friendRequestData.setFriendName(friendRequest.getSender().getUserGuest().getName());
             friendRequestData.setStatus(friendRequest.getStatus());
             listFriendData.add(friendRequestData);
         }
@@ -57,12 +57,12 @@ public class FriendService {
         for (FriendRequest friend : friendList) {
             UserResponseData userResponseData = new UserResponseData();
             if(friend.getId().getSenderId() != idPlayer) {
-                userResponseData.setId(friend.getId().getSenderId());
-                userResponseData.setName(friend.getSender().getName());
+                userResponseData.setUserId(friend.getId().getSenderId());
+                userResponseData.setName(friend.getSender().getUserGuest().getName());
                 userResponseData.setScore(userRepositories.findById(friend.getId().getSenderId()).get().getScore());
             } else {
-                userResponseData.setId(friend.getId().getReceiverId());
-                userResponseData.setName(friend.getReceiver().getName());
+                userResponseData.setUserId(friend.getId().getReceiverId());
+                userResponseData.setName(friend.getReceiver().getUserGuest().getName());
                 userResponseData.setScore(userRepositories.findById(friend.getId().getReceiverId()).get().getScore());
             }
             listUserData.add(userResponseData);

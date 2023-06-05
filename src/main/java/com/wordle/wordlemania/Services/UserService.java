@@ -8,7 +8,9 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.wordle.wordlemania.Entity.Guest;
 import com.wordle.wordlemania.Entity.User;
+import com.wordle.wordlemania.Model.PlayerStatus;
 import com.wordle.wordlemania.Repos.UserRepositories;
 import com.wordle.wordlemania.Utils.PasswordUtils;
 import com.wordle.wordlemania.dto.UserResponseData;
@@ -23,15 +25,21 @@ public class UserService {
     @Autowired
     private UserRepositories userRepository;
 
+    public boolean isExistByGuestId(int guestId) {
+        return userRepository.existsByGuestId(guestId);
+    }
+
     public UserResponseData getUserData(int id) {
         User user = userRepository.findById(id).get();
         UserResponseData userPublic = new UserResponseData();
-        userPublic.setId(user.getId());
-        userPublic.setName(user.getName());
-        userPublic.setEmail(user.getEmail());
+        userPublic.setGuestId(user.getUserGuest().getId());
+        userPublic.setName(user.getUserGuest().getName());
+        userPublic.setUserId(user.getId());
+        // userPublic.setEmail(user.getEmail());
         userPublic.setScore(user.getScore());
         userPublic.setTotalPlay(user.getTotalPlay());
         userPublic.setTotalWin(user.getTotalWin());
+        userPublic.setStatus(user.getStatus());
         return userPublic;
     }
 
@@ -55,9 +63,10 @@ public class UserService {
         return 0;
     }
 
-    public String registerUser(UserRequest userRequest) {
+    public String registerUser(Guest guest, UserRequest userRequest) {
+        guest.setName(userRequest.getName());
         User user = new User();
-        user.setName(userRequest.getName());
+        user.setUserGuest(guest);
         user.setEmail(userRequest.getEmail());
         String salt;
         try {
@@ -68,6 +77,7 @@ public class UserService {
         }
         user.setPassword(PasswordUtils.generateHashPass(userRequest.getPassword(), salt));
         user.setSalt(salt);
+        user.setStatus(PlayerStatus.Online);
         userRepository.save(user);
         return "Player successfully registered";
     }
@@ -76,7 +86,7 @@ public class UserService {
         UserResponseData userDataChanges = new UserResponseData();
 
         if (userResponseData.getName() != null && !userResponseData.getName().isEmpty()) {
-            user.setName(userResponseData.getName());
+            user.getUserGuest().setName(userResponseData.getName());
             userDataChanges.setName(userResponseData.getName());
         }
 
@@ -112,6 +122,11 @@ public class UserService {
             userDataChanges.setTotalWin(userResponseData.getTotalWin());
         }
 
+        if (userResponseData.getStatus() != null) {
+            user.setStatus(userResponseData.getStatus());
+            userDataChanges.setStatus(userResponseData.getStatus());
+        }
+
         userRepository.save(user);
 
         return userDataChanges;
@@ -127,7 +142,7 @@ public class UserService {
         for (User user : topPlayers) {
             UserResponseData userPublic = new UserResponseData();
             // userPublic.setId(user.getId());
-            userPublic.setName(user.getName());
+            userPublic.setName(user.getUserGuest().getName());
             userPublic.setScore(user.getScore());
             // userPublic.setTotalPlay(user.getTotalPlay());
             userPublic.setTotalWin(user.getTotalWin());

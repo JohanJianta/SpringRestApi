@@ -1,6 +1,7 @@
 package com.wordle.wordlemania.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.wordle.wordlemania.Model.PlayerStatus;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
@@ -15,7 +16,8 @@ import lombok.Setter;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserResponseData {
-    private Integer id;
+    private Integer guestId;
+    private Integer userId;
     private String name;
 
     @Size(max = 255)
@@ -28,5 +30,6 @@ public class UserResponseData {
     private Integer score;
     private Integer totalPlay;
     private Integer totalWin;
+    private PlayerStatus status;
     
 }

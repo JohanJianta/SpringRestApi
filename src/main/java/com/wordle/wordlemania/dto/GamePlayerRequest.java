@@ -10,10 +10,10 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class HistoryRequest {
-    @NotNull(message = "User Id must is required")
-    private int userId;
+public class GamePlayerRequest {
+    @NotNull(message = "Player Id is required")
+    private Integer playerId;
 
-    @NotNull(message = "Room Id is required")
-    private int roomId;
+    @NotNull(message = "Game Id is required")
+    private Integer gameId;
 }

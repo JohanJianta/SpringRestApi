@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,8 +15,11 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class HistoryData {
-    private int id;
+    private Integer gameCode;
+
+    private Integer roomId;
 
     private boolean isWin;
 
@@ -22,11 +27,25 @@ public class HistoryData {
 
     private Date date;
 
-    private int score;
+    private Integer score;
 
-    private List<String> playerNames = new ArrayList<String>();
+    private Integer guessesTry;
 
-    public void addPlayer(String playerName) {
+    private List<String> playerNames;
+    
+    private List<Integer> playerIds;
+    
+    public void addPlayerName(String playerName) {
+        if(playerNames == null) {
+            playerNames = new ArrayList<String>();
+        }
         playerNames.add(playerName);
+    }
+
+    public void addPlayerId(Integer playerId) {
+        if(playerIds == null) {
+            playerIds = new ArrayList<Integer>();
+        }
+        playerIds.add(playerId);
     }
 }

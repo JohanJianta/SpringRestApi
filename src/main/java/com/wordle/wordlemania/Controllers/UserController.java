@@ -18,7 +18,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.wordle.wordlemania.Entity.Guest;
 import com.wordle.wordlemania.Entity.User;
+import com.wordle.wordlemania.Services.GuestService;
 import com.wordle.wordlemania.Services.UserService;
 import com.wordle.wordlemania.dto.ResponseData;
 import com.wordle.wordlemania.dto.UserResponseData;
@@ -33,8 +35,75 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    public UserResponseData getUser(int idPlayer) {
-        return userService.getUserData(idPlayer);
+    @Autowired
+    private GuestService guestService;
+
+    @PostMapping("/Guest")
+    public Guest createGuest(@RequestBody String name) {
+
+        if (name != null && !name.isEmpty()) {
+            return guestService.saveGuest(name);
+        } else {
+            return guestService.saveGuest("Guest");
+        }
+
+    }
+
+    @PostMapping("/Login")
+    public ResponseEntity<ResponseData<UserResponseData>> authenticateUser(@Valid @RequestBody UserRequest userRequest,
+            Errors errors) {
+        ResponseData<UserResponseData> responseData = new ResponseData<>();
+        int playerId;
+
+        if (errors.hasErrors()) {
+            for (ObjectError error : errors.getAllErrors()) {
+                responseData.getMessages().add(error.getDefaultMessage());
+            }
+            responseData.setStatus(false);
+            responseData.setPayload(null);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseData);
+        } else if ((playerId = userService.loginUser(userRequest.getEmail(), userRequest.getPassword())) != 0) {
+            responseData.setStatus(true);
+            responseData.setPayload(userService.getUserData(playerId));
+            responseData.getMessages().add("Authentication Success!");
+            return ResponseEntity.ok().body(responseData);
+        } else {
+            responseData.setStatus(false);
+            responseData.setPayload(null);
+            responseData.getMessages().add("Incorrect Email or Password");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseData);
+        }
+
+    }
+
+    // buat satu player
+    @PostMapping("/Register")
+    public ResponseEntity<ResponseData<String>> createUser(@Valid @RequestBody UserRequest userRequest, Errors errors) {
+        Optional<Guest> guestOptional = guestService.getGuestById(userRequest.getGuestId());
+        ResponseData<String> responseData = new ResponseData<>();
+
+        if (errors.hasErrors()) {
+            for (ObjectError error : errors.getAllErrors()) {
+                responseData.getMessages().add(error.getDefaultMessage());
+            }
+            responseData.setStatus(false);
+            responseData.setPayload(null);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseData);
+        } else if (userService.getUserByEmail(userRequest.getEmail()).isPresent()) {
+            responseData.setStatus(false);
+            responseData.setPayload(null);
+            responseData.getMessages().add(String.format("The email you used already linked to another account", userRequest.getEmail()));
+            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(responseData);
+        } else {
+            if(!guestOptional.isPresent() || userService.isExistByGuestId(userRequest.getGuestId())) {
+                responseData.getMessages().add(userService.registerUser(guestService.saveGuest("Guest"), userRequest));
+            } else {
+                responseData.getMessages().add(userService.registerUser(guestOptional.get(), userRequest));
+            }
+            responseData.setStatus(true);
+            responseData.setPayload(null);
+            return ResponseEntity.ok(responseData);
+        }
     }
 
     @GetMapping("/{idPlayer}")
@@ -62,61 +131,6 @@ public class UserController {
         return ResponseEntity.ok().body(responseData);
     }
 
-    // ambil info satu player
-    @PostMapping("/Login")
-    public ResponseEntity<ResponseData<Integer>> authenticateUser(@Valid @RequestBody UserRequest userRequest,
-            Errors errors) {
-        ResponseData<Integer> responseData = new ResponseData<>();
-        int playerId;
-
-        if (errors.hasErrors()) {
-            for (ObjectError error : errors.getAllErrors()) {
-                responseData.getMessages().add(error.getDefaultMessage());
-            }
-            responseData.setStatus(false);
-            responseData.setPayload(null);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseData);
-        } else if ((playerId = userService.loginUser(userRequest.getEmail(), userRequest.getPassword())) != 0) {
-            responseData.setStatus(true);
-            responseData.setPayload(playerId);
-            responseData.getMessages().add("Authentication Success!");
-            return ResponseEntity.ok().body(responseData);
-        } else {
-            responseData.setStatus(false);
-            responseData.setPayload(null);
-            responseData.getMessages().add("Incorrect Email or Password");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseData);
-        }
-
-    }
-
-    // buat satu player
-    @PostMapping("/Register")
-    public ResponseEntity<ResponseData<String>> createUser(@Valid @RequestBody UserRequest userRequest,
-            Errors errors) {
-
-        ResponseData<String> responseData = new ResponseData<>();
-
-        if (errors.hasErrors()) {
-            for (ObjectError error : errors.getAllErrors()) {
-                responseData.getMessages().add(error.getDefaultMessage());
-            }
-            responseData.setStatus(false);
-            responseData.setPayload(null);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseData);
-        } else if (userService.getUserByEmail(userRequest.getEmail()).isPresent()) {
-            responseData.setStatus(false);
-            responseData.setPayload(null);
-            responseData.getMessages()
-                    .add(String.format("The email you used already linked to another account", userRequest.getEmail()));
-            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(responseData);
-        } else {
-            responseData.setStatus(true);
-            responseData.setPayload(null);
-            responseData.getMessages().add(userService.registerUser(userRequest));
-            return ResponseEntity.ok(responseData);
-        }
-    }
 
     // update info satu player
     @PutMapping("/{idPlayer}")

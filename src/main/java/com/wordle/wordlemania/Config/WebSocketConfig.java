@@ -10,18 +10,6 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer{
 
-    // @Override
-    // public void configureMessageBroker(MessageBrokerRegistry registry) {
-    //     registry.setApplicationDestinationPrefixes("/app");
-    //     registry.enableSimpleBroker("/chatroom", "/user");
-    //     registry.setUserDestinationPrefix("/user");
-    // }
-
-    // @Override
-    // public void registerStompEndpoints(StompEndpointRegistry registry) {
-    //     registry.addEndpoint("/ws").setAllowedOriginPatterns("*").withSockJS();
-    // }
-
     @Override
 	public void registerStompEndpoints(StompEndpointRegistry registry) {
 		registry.addEndpoint("/play").setAllowedOriginPatterns("*").withSockJS();
@@ -29,8 +17,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer{
 	
 	@Override
 	public void configureMessageBroker(MessageBrokerRegistry registry) {
-		registry.enableSimpleBroker("/topic");
+		registry.enableSimpleBroker("/room", "/chatroom", "/setting", "/answer");
 		registry.setApplicationDestinationPrefixes("/app");
+        registry.setUserDestinationPrefix("/room");
 	}
     
 }

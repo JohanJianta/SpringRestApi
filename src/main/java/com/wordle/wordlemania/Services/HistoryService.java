@@ -10,7 +10,6 @@ import com.wordle.wordlemania.Entity.History;
 import com.wordle.wordlemania.Entity.Room;
 import com.wordle.wordlemania.Model.HistoryId;
 import com.wordle.wordlemania.Repos.HistoryRepositories;
-import com.wordle.wordlemania.Repos.UserRepositories;
 import com.wordle.wordlemania.dto.HistoryData;
 
 import jakarta.transaction.Transactional;
@@ -23,28 +22,28 @@ public class HistoryService {
     private HistoryRepositories historyRepository;
 
     @Autowired
-    private UserRepositories userRepository;
+    private GamePlayerService gamePlayerService;
 
-    public boolean isExist(int userId, int roomId) {
-        return historyRepository.existsByUserIdAndRoomIdAndShowableTrue(userId, roomId);
+    public boolean isExist(int guestId, int roomId) {
+        return historyRepository.existsByGuestIdAndRoomIdAndShowableTrue(guestId, roomId);
     }
 
     public List<HistoryData> getAllHistory(int idPlayer) {
-        List<History> histories = historyRepository.findAllHistoryByUserIdAndShowableTrueOrderByRoomId(idPlayer);
+        List<History> histories = historyRepository.findAllHistoryByGuestIdAndShowableTrueOrderByRoomId(idPlayer);
         List<HistoryData> historiesData = new ArrayList<>();
         if (!histories.isEmpty()) {
             for (History history : histories) {
                 HistoryData data = new HistoryData();
                 Room room = history.getRoom();
-                data.setId(room.getId());
+                data.setRoomId(room.getId());
                 data.setWin(room.isWin());
-                data.setWord(room.getWord());
+                data.setWord(room.getWord().getWord());
                 data.setDate(room.getDate());
                 data.setScore(room.getScorePrize());
 
-                List<History> gamePlayers = historyRepository.findAllByRoomId(room.getId());
+                List<History> gamePlayers = historyRepository.findAllByRoom(room);
                 for (History player : gamePlayers) {
-                    data.addPlayer(userRepository.findById(player.getId().getUserId()).get().getName());
+                    data.addPlayerName(player.getGuest().getName());
                 }
 
                 historiesData.add(data);
@@ -53,20 +52,19 @@ public class HistoryService {
         return historiesData;
     }
 
-    public String saveUser(int userId, int roomId) {
-        History history = new History();
-        HistoryId historyId = new HistoryId();
-        historyId.setUserId(userId);
-        historyId.setRoomId(roomId);
-        history.setId(historyId);
-        history.setShowable(true);
-        historyRepository.save(history);
-
-        return "Player succesfully added to history";
+    public String saveAllPlayers(int gameId, int roomId) {
+        List<Integer> playerIds = gamePlayerService.getAllPlayerIds(gameId);
+        for (Integer playerId : playerIds) {
+            History history = new History();
+            history.setId(new HistoryId(roomId, playerId));
+            history.setShowable(true);
+            historyRepository.save(history);
+        }
+        return "All players succesfully added to history";
     }
 
-    public void delete(int userId, int roomId) {
-        History history = historyRepository.findByUserIdAndRoomId(userId, roomId);
+    public void delete(int guestId, int roomId) {
+        History history = historyRepository.findByGuestIdAndRoomId(guestId, roomId);
         history.setShowable(false);
         historyRepository.save(history);
     }

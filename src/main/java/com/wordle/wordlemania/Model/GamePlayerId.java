@@ -1,7 +1,5 @@
 package com.wordle.wordlemania.Model;
 
-import java.io.Serializable;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;
@@ -14,10 +12,10 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Embeddable
-public class HistoryId implements Serializable {
-
-    @Column(columnDefinition = "int(9)", name = "room_id")
-    private Integer roomId;
+public class GamePlayerId {
+    
+    @Column(columnDefinition = "int(7)", name = "game_id")
+    private Integer gameId;
 
     @Column(columnDefinition = "int(7)", name = "guest_id")
     private Integer guestId;

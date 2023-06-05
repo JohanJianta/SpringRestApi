@@ -1,8 +1,9 @@
 package com.wordle.wordlemania.Entity;
 
-import com.wordle.wordlemania.Model.HistoryId;
+import java.io.Serializable;
 
-import jakarta.persistence.Column;
+import com.wordle.wordlemania.Model.GamePlayerId;
+
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -18,21 +19,18 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "history")
-public class History {
-
+@Table(name = "gameroom_player")
+public class GamePlayer implements Serializable {
+    
     @EmbeddedId
-    private HistoryId id;
-
-    @Column(nullable = false, columnDefinition = "tinyint(1) default true", name = "showable")
-    private boolean showable;
+    private GamePlayerId id;
 
     @ManyToOne
-    @JoinColumn(name = "room_id", insertable=false, updatable = false)
-    private Room room;
+    @JoinColumn(name = "game_id", insertable=false, updatable = false)
+    private Game game;
 
-    // @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "guest_id", insertable=false, updatable = false)
     private Guest guest;
+
 }

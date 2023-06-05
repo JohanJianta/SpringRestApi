@@ -5,15 +5,16 @@ import java.util.List;
 import org.springframework.data.repository.CrudRepository;
 
 import com.wordle.wordlemania.Entity.History;
+import com.wordle.wordlemania.Entity.Room;
 import com.wordle.wordlemania.Model.HistoryId;
 
 public interface HistoryRepositories extends CrudRepository<History, HistoryId> {
     
-    List<History> findAllHistoryByUserIdAndShowableTrueOrderByRoomId (Integer userId);
+    List<History> findAllHistoryByGuestIdAndShowableTrueOrderByRoomId (Integer guestId);
 
-    List<History> findAllByRoomId (Integer roomId);
+    List<History> findAllByRoom (Room room);
 
-    boolean existsByUserIdAndRoomIdAndShowableTrue(Integer userId, Integer roomId);
+    boolean existsByGuestIdAndRoomIdAndShowableTrue (Integer guestId, Integer roomId);
 
-    History findByUserIdAndRoomId (Integer userId, Integer roomId);
+    History findByGuestIdAndRoomId (Integer guestId, Integer roomId);
 }

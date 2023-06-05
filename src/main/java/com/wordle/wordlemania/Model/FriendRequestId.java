@@ -4,7 +4,11 @@ import java.io.Serializable;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 @Embeddable
 public class FriendRequestId implements Serializable {
 
@@ -13,21 +17,5 @@ public class FriendRequestId implements Serializable {
 
     @Column(columnDefinition = "int(5)", name = "receiver_id")
     private Integer receiverId;
-
-    public Integer getSenderId() {
-        return senderId;
-    }
-
-    public void setSenderId(Integer userId) {
-        this.senderId = userId;
-    }
-
-    public Integer getReceiverId() {
-        return receiverId;
-    }
-
-    public void setReceiverId(Integer friendId) {
-        this.receiverId = friendId;
-    }
 
 }
