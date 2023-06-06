@@ -45,6 +45,7 @@ public class FriendService {
             FriendRequestData friendRequestData = new FriendRequestData();
             friendRequestData.setId(friendRequest.getId().getSenderId());
             friendRequestData.setFriendName(friendRequest.getSender().getUserGuest().getName());
+            friendRequestData.setFriendScore(friendRequest.getSender().getScore());
             friendRequestData.setStatus(friendRequest.getStatus());
             listFriendData.add(friendRequestData);
         }

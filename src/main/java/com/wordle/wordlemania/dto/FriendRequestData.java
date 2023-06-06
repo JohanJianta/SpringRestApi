@@ -19,4 +19,6 @@ public class FriendRequestData {
     private FriendStatus status;
 
     private String friendName;
+
+    private Integer friendScore;
 }
