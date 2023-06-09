@@ -61,10 +61,14 @@ public class FriendService {
                 userResponseData.setUserId(friend.getId().getSenderId());
                 userResponseData.setName(friend.getSender().getUserGuest().getName());
                 userResponseData.setScore(userRepositories.findById(friend.getId().getSenderId()).get().getScore());
+                userResponseData.setTotalPlay(userRepositories.findById(friend.getId().getSenderId()).get().getTotalPlay());
+                userResponseData.setTotalWin(userRepositories.findById(friend.getId().getSenderId()).get().getTotalWin());
             } else {
                 userResponseData.setUserId(friend.getId().getReceiverId());
                 userResponseData.setName(friend.getReceiver().getUserGuest().getName());
                 userResponseData.setScore(userRepositories.findById(friend.getId().getReceiverId()).get().getScore());
+                userResponseData.setTotalPlay(userRepositories.findById(friend.getId().getReceiverId()).get().getTotalPlay());
+                userResponseData.setTotalWin(userRepositories.findById(friend.getId().getReceiverId()).get().getTotalWin());
             }
             listUserData.add(userResponseData);
         }
