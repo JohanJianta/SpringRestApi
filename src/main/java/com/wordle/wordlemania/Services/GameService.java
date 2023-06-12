@@ -12,27 +12,37 @@ import com.wordle.wordlemania.Repos.GameRepositories;
 
 @Service
 public class GameService {
-    
+
     @Autowired
     private GameRepositories gameRepository;
 
     public Optional<Game> getGameById(int gameId) {
         return gameRepository.findById(gameId);
     }
-    
+
     public Game getRandomGame() {
-        List<Game> listGame =  gameRepository.findByStatus(RoomStatus.Public);
+        List<Game> listGame = gameRepository.findByStatus(RoomStatus.Public);
         for (Game game : listGame) {
-            if(!gameRepository.hasFourPlayers(game)) {
+            int count = gameRepository.getNumberOfPlayers(game);
+            if (count < 4) {
+                if (count == 3) {
+                    game.setStatus(RoomStatus.Closed);
+                    gameRepository.save(game);
+                }
                 return game;
             }
         }
         return null;
     }
-    
+
     public Game getPrivateRoom(int id) {
         Game game = gameRepository.findByIdAndStatusOrIdAndStatus(id, RoomStatus.Private, id, RoomStatus.Public);
-        if(!gameRepository.hasFourPlayers(game)) {
+        int count = gameRepository.getNumberOfPlayers(game);
+        if (count < 4) {
+            if (count == 3) {
+                game.setStatus(RoomStatus.Closed);
+                gameRepository.save(game);
+            }
             return game;
         } else {
             return null;

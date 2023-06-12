@@ -45,6 +45,7 @@ public class RoomService {
         historyData.setGameCode(game.getId());
         historyData.setRoomId(savedRoom.getId());
         historyData.setWord(savedRoom.getWord().getWord());
+        historyData.setScore(savedRoom.getScorePrize());
         historyData.setGuessesTry(savedRoom.getGuessesTry());
 
         List<Integer> playerIds = gamePlayerService.getAllPlayerIds(game.getId());

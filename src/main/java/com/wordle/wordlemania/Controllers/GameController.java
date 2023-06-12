@@ -147,7 +147,7 @@ public class GameController {
 
     @PostMapping("/Player")
     public ResponseEntity<ResponseData<Boolean>> joinRoom(@Valid @RequestBody GamePlayerRequest playerRequest, Errors errors) {
-        Game game = gameService.getPrivateRoom(playerRequest.getGameId());
+        Optional<Game> optionalGame = gameService.getGameById(playerRequest.getGameId());
         Optional<Guest> optionalGuest = guestService.getGuestById(playerRequest.getPlayerId());
         ResponseData<Boolean> responseData = new ResponseData<>();
 
@@ -158,7 +158,7 @@ public class GameController {
             responseData.setStatus(false);
             responseData.setPayload(null);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseData);
-        } else if (game != null && optionalGuest.isPresent()) {
+        } else if (optionalGame.isPresent() && optionalGuest.isPresent()) {
             responseData.setStatus(true);
             responseData.setPayload(gamePlayerService.savePlayer(playerRequest.getPlayerId(), playerRequest.getGameId()));
             responseData.getMessages().add("Successfully add player");

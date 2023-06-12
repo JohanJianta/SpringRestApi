@@ -14,7 +14,11 @@ public interface GameRepositories extends CrudRepository<Game, Integer> {
 
     public Game findByIdAndStatusOrIdAndStatus(Integer id1, RoomStatus status1, Integer id2, RoomStatus status2);
 
-    @Query("SELECT COUNT(gp) = 4 FROM Game g JOIN g.gamePlayer gp WHERE g = :game")
-    Boolean hasFourPlayers(@Param("game") Game game);
+    // @Query("SELECT COUNT(gp) = 4 FROM Game g JOIN g.gamePlayer gp WHERE g =
+    // :game")
+    // Boolean hasFourPlayers(@Param("game") Game game);
+
+    @Query("SELECT COUNT(gp) FROM Game g JOIN g.gamePlayer gp WHERE g = :game")
+    Integer getNumberOfPlayers(@Param("game") Game game);
 
 }
