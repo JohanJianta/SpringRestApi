@@ -13,4 +13,6 @@ public interface GamePlayerRepositories extends CrudRepository<GamePlayer, GameP
     List<Integer> findGuestIdsByGameId(Integer gameId);
 
     Boolean existsByGuestIdAndGameId (Integer guestId, Integer gameId);
+
+    Integer countByGameId (Integer gameId);
 }

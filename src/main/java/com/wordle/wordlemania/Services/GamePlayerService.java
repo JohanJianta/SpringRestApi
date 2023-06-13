@@ -14,20 +14,23 @@ public class GamePlayerService {
 
     @Autowired
     private GamePlayerRepositories gamePlayerRepository;
+    
+    @Autowired
+    private GameService gameService;
 
     // public Optional<Guest> getGuestById (int guestId) {
-    //     return guestRepository.findById(guestId);
+    // return guestRepository.findById(guestId);
     // }
 
-    public boolean isExist (int guestId, int gameId) {
+    public boolean isExist(int guestId, int gameId) {
         return gamePlayerRepository.existsByGuestIdAndGameId(guestId, gameId);
     }
 
-    public List<Integer> getAllPlayerIds (int gameId) {
+    public List<Integer> getAllPlayerIds(int gameId) {
         return gamePlayerRepository.findGuestIdsByGameId(gameId);
     }
 
-    public Boolean savePlayer (int guestId, int gameId) {
+    public Boolean savePlayer(int guestId, int gameId) {
         GamePlayerId gamePlayerId = new GamePlayerId(gameId, guestId);
         GamePlayer gamePlayer = new GamePlayer();
         gamePlayer.setId(gamePlayerId);
@@ -35,9 +38,12 @@ public class GamePlayerService {
         return true;
     }
 
-    public Boolean removePlayer (int guestId, int gameId) {
+    public Boolean removePlayer(int guestId, int gameId) {
         GamePlayerId gamePlayerId = new GamePlayerId(gameId, guestId);
         gamePlayerRepository.deleteById(gamePlayerId);
+        if (gamePlayerRepository.countByGameId(gameId) == 0) {
+            gameService.finishGame(gameId);
+        }
         return true;
     }
 }

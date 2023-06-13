@@ -108,18 +108,22 @@ public class UserService {
         }
 
         if (userResponseData.getScore() != null) {
-            user.setScore(userResponseData.getScore());
-            userDataChanges.setScore(userResponseData.getScore());
+            int score = user.getScore() + userResponseData.getScore();
+            if (score < 0) {
+                score = 0;
+            }
+            user.setScore(score);
+            userDataChanges.setScore(user.getScore());
         }
 
         if (userResponseData.getTotalPlay() != null) {
-            user.setTotalPlay(userResponseData.getTotalPlay());
-            userDataChanges.setTotalPlay(userResponseData.getTotalPlay());
+            user.setTotalPlay(user.getTotalPlay() + userResponseData.getTotalPlay());
+            userDataChanges.setTotalPlay(user.getTotalPlay());
         }
 
         if (userResponseData.getTotalWin() != null) {
-            user.setTotalWin(userResponseData.getTotalWin());
-            userDataChanges.setTotalWin(userResponseData.getTotalWin());
+            user.setTotalWin(user.getTotalWin() + userResponseData.getTotalWin());
+            userDataChanges.setTotalWin(user.getTotalWin());
         }
 
         if (userResponseData.getStatus() != null) {

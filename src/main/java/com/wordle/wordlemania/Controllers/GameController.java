@@ -59,7 +59,7 @@ public class GameController {
         } else {
             responseData.setStatus(false);
             responseData.setPayload(null);
-            responseData.getMessages().add("There are no public rooms available");
+            responseData.getMessages().add("There are no public room available");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseData);
         }
     }
@@ -222,27 +222,27 @@ public class GameController {
         }
     }
 
-    @DeleteMapping("/{gameCode}")
-    public ResponseEntity<String> disableGameroom(@PathVariable(value = "gameCode") int id) {
-        Optional<Game> optionalGame = gameService.getGameById(id);
+    // @DeleteMapping("/{gameCode}")
+    // public ResponseEntity<String> disableGameroom(@PathVariable(value = "gameCode") int id) {
+    //     Optional<Game> optionalGame = gameService.getGameById(id);
 
-        if (optionalGame.isPresent()) {
-            gameService.finishGame(optionalGame.get());
-            return ResponseEntity.ok("Gameroom succesfully deleted");
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error: Gameroom Not Found");
-        }
-    }
+    //     if (optionalGame.isPresent()) {
+    //         gameService.finishGame(optionalGame.get());
+    //         return ResponseEntity.ok("Gameroom succesfully deleted");
+    //     } else {
+    //         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error: Gameroom Not Found");
+    //     }
+    // }
 
-    @DeleteMapping("/Data/{roomCode}")
-    public ResponseEntity<String> deleteRoom(@PathVariable(value = "roomCode") int id) {
-        Optional<Room> userOptional = roomService.getRoomById(id);
+    // @DeleteMapping("/Data/{roomCode}")
+    // public ResponseEntity<String> deleteRoom(@PathVariable(value = "roomCode") int id) {
+    //     Optional<Room> userOptional = roomService.getRoomById(id);
 
-        if (userOptional.isPresent()) {
-            roomService.delete(id);
-            return ResponseEntity.ok("Room succesfully deleted");
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error: Room Not Found");
-        }
-    }
+    //     if (userOptional.isPresent()) {
+    //         roomService.delete(id);
+    //         return ResponseEntity.ok("Room succesfully deleted");
+    //     } else {
+    //         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error: Room Not Found");
+    //     }
+    // }
 }

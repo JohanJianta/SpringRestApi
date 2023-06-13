@@ -67,7 +67,7 @@ public class HistoryController {
 
     @PostMapping
     public ResponseEntity<ResponseData<String>> addToHistory(@Valid @RequestBody GamePlayerRequest gamePlayerRequest, Errors errors) {
-        Game gamePlayer = gameService.getPrivateRoom(gamePlayerRequest.getGameId());
+        Optional<Game> gameOptional = gameService.getGameById(gamePlayerRequest.getGameId());
         Optional<Room> roomOptional = roomService.getRoomById(gamePlayerRequest.getPlayerId());
         ResponseData<String> responseData = new ResponseData<>();
         responseData.setPayload(null);
@@ -79,7 +79,7 @@ public class HistoryController {
             }
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseData);
 
-        } else if (gamePlayer != null && roomOptional.isPresent()) {
+        } else if (gameOptional.isPresent() && roomOptional.isPresent()) {
             responseData.setStatus(true);
             responseData.getMessages().add(historyService.saveAllPlayers(gamePlayerRequest.getGameId(), gamePlayerRequest.getPlayerId()));
             RoomResponseData roomData = new RoomResponseData();
