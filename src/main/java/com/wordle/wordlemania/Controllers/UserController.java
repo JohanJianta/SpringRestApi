@@ -50,8 +50,7 @@ public class UserController {
     }
 
     @PostMapping("/Login")
-    public ResponseEntity<ResponseData<UserResponseData>> authenticateUser(@Valid @RequestBody UserRequest userRequest,
-            Errors errors) {
+    public ResponseEntity<ResponseData<UserResponseData>> authenticateUser(@Valid @RequestBody UserRequest userRequest, Errors errors) {
         ResponseData<UserResponseData> responseData = new ResponseData<>();
         int playerId;
 
