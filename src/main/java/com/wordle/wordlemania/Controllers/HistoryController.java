@@ -54,7 +54,7 @@ public class HistoryController {
 
         if (userOptional.isPresent()) {
             listRoom.setStatus(true);
-            listRoom.setPayload(historyService.getAllHistory(idPlayer));
+            listRoom.setPayload(historyService.getAllHistory(userOptional.get().getUserGuest().getId()));
             return ResponseEntity.ok().body(listRoom);
         } else {
             listRoom.setStatus(false);

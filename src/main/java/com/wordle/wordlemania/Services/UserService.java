@@ -63,7 +63,7 @@ public class UserService {
         return 0;
     }
 
-    public String registerUser(Guest guest, UserRequest userRequest) {
+    public int registerUser(Guest guest, UserRequest userRequest) {
         guest.setName(userRequest.getName());
         User user = new User();
         user.setUserGuest(guest);
@@ -73,13 +73,12 @@ public class UserService {
             salt = PasswordUtils.generateSalt();
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
-            return "Something went wrong during creating account, please try again";
+            return 0;
         }
         user.setPassword(PasswordUtils.generateHashPass(userRequest.getPassword(), salt));
         user.setSalt(salt);
         user.setStatus(PlayerStatus.Online);
-        userRepository.save(user);
-        return "Player successfully registered";
+        return userRepository.save(user).getId();
     }
 
     public UserResponseData update(UserResponseData userResponseData, User user) {
@@ -141,7 +140,7 @@ public class UserService {
     }
 
     public List<UserResponseData> getTopPlayers() {
-        List<User> topPlayers = userRepository.findTop3ByOrderByScoreDescTotalWinDescTotalPlayAsc();
+        List<User> topPlayers = userRepository.findTop3ByOrderByScoreDescTotalWinDescTotalPlayDesc();
         List<UserResponseData> topPlayersData = new ArrayList<>();
         for (User user : topPlayers) {
             UserResponseData userPublic = new UserResponseData();

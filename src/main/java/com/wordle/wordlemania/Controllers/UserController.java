@@ -50,7 +50,8 @@ public class UserController {
     }
 
     @PostMapping("/Login")
-    public ResponseEntity<ResponseData<UserResponseData>> authenticateUser(@Valid @RequestBody UserRequest userRequest, Errors errors) {
+    public ResponseEntity<ResponseData<UserResponseData>> authenticateUser(@Valid @RequestBody UserRequest userRequest,
+            Errors errors) {
         ResponseData<UserResponseData> responseData = new ResponseData<>();
         int playerId;
 
@@ -77,9 +78,9 @@ public class UserController {
 
     // buat satu player
     @PostMapping("/Register")
-    public ResponseEntity<ResponseData<String>> createUser(@Valid @RequestBody UserRequest userRequest, Errors errors) {
+    public ResponseEntity<ResponseData<UserResponseData>> createUser(@Valid @RequestBody UserRequest userRequest, Errors errors) {
         Optional<Guest> guestOptional = guestService.getGuestById(userRequest.getGuestId());
-        ResponseData<String> responseData = new ResponseData<>();
+        ResponseData<UserResponseData> responseData = new ResponseData<>();
 
         if (errors.hasErrors()) {
             for (ObjectError error : errors.getAllErrors()) {
@@ -94,14 +95,23 @@ public class UserController {
             responseData.getMessages().add(String.format("The email you used already linked to another account", userRequest.getEmail()));
             return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(responseData);
         } else {
+            int playerId;
             if(!guestOptional.isPresent() || userService.isExistByGuestId(userRequest.getGuestId())) {
-                responseData.getMessages().add(userService.registerUser(guestService.saveGuest("Guest"), userRequest));
+                playerId = userService.registerUser(guestService.saveGuest("Guest"), userRequest);
             } else {
-                responseData.getMessages().add(userService.registerUser(guestOptional.get(), userRequest));
+                playerId = userService.registerUser(guestOptional.get(), userRequest);
             }
-            responseData.setStatus(true);
-            responseData.setPayload(null);
-            return ResponseEntity.ok(responseData);
+
+            if (playerId == 0) {
+                responseData.setStatus(false);
+                responseData.setPayload(null);
+                responseData.getMessages().add("Something went wrong during registration. Please try again");
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseData);
+            } else {
+                responseData.setStatus(true);
+                responseData.setPayload(userService.getUserData(playerId));
+                return ResponseEntity.ok(responseData);
+            }
         }
     }
 
@@ -129,7 +139,6 @@ public class UserController {
         responseData.setPayload(userService.getTopPlayers());
         return ResponseEntity.ok().body(responseData);
     }
-
 
     // update info satu player
     @PutMapping("/{idPlayer}")
