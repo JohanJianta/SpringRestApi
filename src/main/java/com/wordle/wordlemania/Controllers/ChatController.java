@@ -28,21 +28,15 @@ public class ChatController {
 		return chatMessage;
 	}
 
-	// @MessageMapping("/game.keyword")
-	// public String sendKeyword(@Payload ChatMessage chatMessage) {
-	// 	String word = null;
-	// 	if (chatMessage.getRequestedLength() < 5 || chatMessage.getRequestedLength() > 10) {
-	// 		word = "Requested word length is not allowed";
-	// 	} else {
-	// 		word = wordController.getRandomWord(chatMessage.getRequestedLength());
-	// 	}
-	// 	simpMessagingTemplate.convertAndSendToUser(Integer.toString(chatMessage.getRoomId()), "/setting", word);
-	// 	return word;
-	// }
-
 	@MessageMapping("/game.answer")
 	public ChatMessage sendAnswer(@Payload ChatMessage chatMessage) {
 		simpMessagingTemplate.convertAndSendToUser(Integer.toString(chatMessage.getGameCode()), "/answer", chatMessage);
+		return chatMessage;
+	}
+
+	@MessageMapping("/game.ready")
+	public ChatMessage sendVote(@Payload ChatMessage chatMessage) {
+		simpMessagingTemplate.convertAndSendToUser(Integer.toString(chatMessage.getGameCode()), "/ready", chatMessage);
 		return chatMessage;
 	}
 

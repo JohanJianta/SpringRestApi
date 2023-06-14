@@ -17,7 +17,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer{
 	
 	@Override
 	public void configureMessageBroker(MessageBrokerRegistry registry) {
-		registry.enableSimpleBroker("/room", "/chatroom", "/setting", "/answer");
+		registry.enableSimpleBroker("/room", "/chatroom", "/setting", "/answer", "/ready");
 		registry.setApplicationDestinationPrefixes("/app");
         registry.setUserDestinationPrefix("/room");
 	}
