@@ -21,9 +21,6 @@ public class HistoryService {
     @Autowired
     private HistoryRepositories historyRepository;
 
-    @Autowired
-    private GamePlayerService gamePlayerService;
-
     public boolean isExist(int guestId, int roomId) {
         return historyRepository.existsByGuestIdAndRoomIdAndShowableTrue(guestId, roomId);
     }
@@ -39,7 +36,7 @@ public class HistoryService {
                 data.setWin(room.isWin());
                 data.setWord(room.getWord().getWord());
                 data.setDate(room.getDate());
-                data.setScore(room.getScorePrize());
+                data.setScore(history.getScoreGain());
 
                 List<History> gamePlayers = historyRepository.findAllByRoom(room);
                 for (History player : gamePlayers) {
@@ -52,15 +49,13 @@ public class HistoryService {
         return historiesData;
     }
 
-    public String saveAllPlayers(int gameId, int roomId) {
-        List<Integer> playerIds = gamePlayerService.getAllPlayerIds(gameId);
-        for (Integer playerId : playerIds) {
-            History history = new History();
-            history.setId(new HistoryId(roomId, playerId));
-            history.setShowable(true);
-            historyRepository.save(history);
-        }
-        return "All players succesfully added to history";
+    public String savePlayer(int roomId, int guestId, int score) {
+        History history = new History();
+        history.setId(new HistoryId(roomId, guestId));
+        history.setScoreGain(score);
+        history.setShowable(true);
+        historyRepository.save(history);
+        return "Player succesfully added to history";
     }
 
     public void delete(int guestId, int roomId) {

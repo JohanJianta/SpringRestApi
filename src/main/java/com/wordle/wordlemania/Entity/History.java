@@ -27,6 +27,9 @@ public class History {
     @Column(nullable = false, columnDefinition = "tinyint(1) default true", name = "showable")
     private boolean showable;
 
+    @Column(nullable = false, columnDefinition = "int(3)", name = "score_gain")
+    private int scoreGain;
+
     @ManyToOne
     @JoinColumn(name = "room_id", insertable=false, updatable = false)
     private Room room;

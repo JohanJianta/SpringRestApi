@@ -13,6 +13,7 @@ public class ChatMessage {
 	private String sender;
 	private MessageType type;
 	private Integer gameCode;
+	private Integer guestId;
 
 	public enum MessageType {
 		CHAT, LEAVE, JOIN

@@ -17,10 +17,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.wordle.wordlemania.Entity.Game;
+import com.wordle.wordlemania.Entity.Guest;
 import com.wordle.wordlemania.Entity.Room;
 import com.wordle.wordlemania.Entity.User;
 import com.wordle.wordlemania.Model.RoomStatus;
 import com.wordle.wordlemania.Services.GameService;
+import com.wordle.wordlemania.Services.GuestService;
 import com.wordle.wordlemania.Services.HistoryService;
 import com.wordle.wordlemania.Services.RoomService;
 import com.wordle.wordlemania.Services.UserService;
@@ -39,7 +41,7 @@ public class HistoryController {
     private HistoryService historyService;
 
     @Autowired
-    private GameService gameService;
+    private GuestService guestService;
 
     @Autowired
     private UserService userService;
@@ -67,8 +69,8 @@ public class HistoryController {
 
     @PostMapping
     public ResponseEntity<ResponseData<String>> addToHistory(@Valid @RequestBody GamePlayerRequest gamePlayerRequest, Errors errors) {
-        Optional<Game> gameOptional = gameService.getGameById(gamePlayerRequest.getGameId());
-        Optional<Room> roomOptional = roomService.getRoomById(gamePlayerRequest.getPlayerId());
+        Optional<Guest> guestOptional = guestService.getGuestById(gamePlayerRequest.getPlayerId());
+        Optional<Room> roomOptional = roomService.getRoomById(gamePlayerRequest.getGameId());
         ResponseData<String> responseData = new ResponseData<>();
         responseData.setPayload(null);
         responseData.setStatus(false);
@@ -79,12 +81,9 @@ public class HistoryController {
             }
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseData);
 
-        } else if (gameOptional.isPresent() && roomOptional.isPresent()) {
+        } else if (guestOptional.isPresent() && roomOptional.isPresent()) {
             responseData.setStatus(true);
-            responseData.getMessages().add(historyService.saveAllPlayers(gamePlayerRequest.getGameId(), gamePlayerRequest.getPlayerId()));
-            RoomResponseData roomData = new RoomResponseData();
-            roomData.setStatus(RoomStatus.Closed);
-            roomService.update(roomData, roomOptional.get());
+            responseData.getMessages().add(historyService.savePlayer(gamePlayerRequest.getGameId(), gamePlayerRequest.getPlayerId(), gamePlayerRequest.getScoreGain()));
             return ResponseEntity.ok().body(responseData);
 
         } else {

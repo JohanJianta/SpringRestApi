@@ -30,7 +30,7 @@ public class Room implements Serializable {
     @Column(nullable = false, columnDefinition = "int(2)", name = "guesses_try")
     private int guessesTry;
     
-    @Column(nullable = false, columnDefinition = "int(2)", name = "score_to_get")
+    @Column(nullable = false, columnDefinition = "int(3)", name = "score_to_get")
     private int scorePrize;
     
     @Column(nullable = false, name = "room_date")

@@ -16,4 +16,6 @@ public class GamePlayerRequest {
 
     @NotNull(message = "Game Id is required")
     private Integer gameId;
+
+    private Integer scoreGain;
 }
