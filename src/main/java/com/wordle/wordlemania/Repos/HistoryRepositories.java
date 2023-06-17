@@ -15,8 +15,13 @@ public interface HistoryRepositories extends CrudRepository<History, HistoryId> 
     // List<History> findAllHistoryByGuestIdAndShowableTrueOrderByRoomId (Integer
     // guestId);
 
-    @Query("SELECT h FROM History h JOIN h.room r WHERE h.guest.id = :guestId AND h.showable = true GROUP BY r.id HAVING COUNT(DISTINCT r.id) <= 20 ORDER BY r.date DESC")
-    List<History> findTop20DistinctRoomIdsByGuestIdAndShowableTrueOrderByDateDesc(@Param("guestId") Integer guestId);
+    @Query(value = "SELECT h.* FROM history h " +
+            "JOIN room_data r ON h.room_id = r.room_id " +
+            "WHERE h.guest_id = :guestId " +
+            "GROUP BY r.room_id " +
+            "ORDER BY r.room_date DESC " +
+            "LIMIT 20", nativeQuery = true)
+    List<History> findTop20HistoriesByGuestIdOrderByDateDesc(@Param("guestId") Integer guestId);
 
     List<History> findAllByRoom(Room room);
 

@@ -53,7 +53,7 @@ public class FriendService {
     }
 
     public List<UserResponseData> getAllAccept(int idPlayer) {
-        List<FriendRequest> friendList = friendReqRepositories.findAllByReceiverIdAndStatusOrSenderIdAndStatus(idPlayer, FriendStatus.ACCEPT, idPlayer, FriendStatus.ACCEPT);
+        List<FriendRequest> friendList = friendReqRepositories.findAllSortedByPlayerStatus(idPlayer, FriendStatus.ACCEPT, idPlayer, FriendStatus.ACCEPT);
         List<UserResponseData> listUserData = new ArrayList<>();
         for (FriendRequest friend : friendList) {
             UserResponseData userResponseData = new UserResponseData();
@@ -63,12 +63,14 @@ public class FriendService {
                 userResponseData.setScore(userRepositories.findById(friend.getId().getSenderId()).get().getScore());
                 userResponseData.setTotalPlay(userRepositories.findById(friend.getId().getSenderId()).get().getTotalPlay());
                 userResponseData.setTotalWin(userRepositories.findById(friend.getId().getSenderId()).get().getTotalWin());
+                userResponseData.setStatus(userRepositories.findById(friend.getId().getSenderId()).get().getStatus());
             } else {
                 userResponseData.setUserId(friend.getId().getReceiverId());
                 userResponseData.setName(friend.getReceiver().getUserGuest().getName());
                 userResponseData.setScore(userRepositories.findById(friend.getId().getReceiverId()).get().getScore());
                 userResponseData.setTotalPlay(userRepositories.findById(friend.getId().getReceiverId()).get().getTotalPlay());
                 userResponseData.setTotalWin(userRepositories.findById(friend.getId().getReceiverId()).get().getTotalWin());
+                userResponseData.setStatus(userRepositories.findById(friend.getId().getReceiverId()).get().getStatus());
             }
             listUserData.add(userResponseData);
         }

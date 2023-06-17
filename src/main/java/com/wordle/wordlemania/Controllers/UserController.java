@@ -78,7 +78,8 @@ public class UserController {
 
     // buat satu player
     @PostMapping("/Register")
-    public ResponseEntity<ResponseData<UserResponseData>> createUser(@Valid @RequestBody UserRequest userRequest, Errors errors) {
+    public ResponseEntity<ResponseData<UserResponseData>> createUser(@Valid @RequestBody UserRequest userRequest,
+            Errors errors) {
         Optional<Guest> guestOptional = guestService.getGuestById(userRequest.getGuestId());
         ResponseData<UserResponseData> responseData = new ResponseData<>();
 
@@ -92,11 +93,12 @@ public class UserController {
         } else if (userService.getUserByEmail(userRequest.getEmail()).isPresent()) {
             responseData.setStatus(false);
             responseData.setPayload(null);
-            responseData.getMessages().add(String.format("The email you used already linked to another account", userRequest.getEmail()));
+            responseData.getMessages()
+                    .add(String.format("The email you used already linked to another account", userRequest.getEmail()));
             return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(responseData);
         } else {
             int playerId;
-            if(!guestOptional.isPresent() || userService.isExistByGuestId(userRequest.getGuestId())) {
+            if (!guestOptional.isPresent() || userService.isExistByGuestId(userRequest.getGuestId())) {
                 playerId = userService.registerUser(guestService.saveGuest("Guest"), userRequest);
             } else {
                 playerId = userService.registerUser(guestOptional.get(), userRequest);
@@ -147,22 +149,18 @@ public class UserController {
         ResponseData<UserResponseData> responseData = new ResponseData<>();
         Optional<User> userOptional = userService.getUserById(id);
 
-        if (userOptional.isPresent()) {
-
-            if (errors.hasErrors()) {
-                for (ObjectError error : errors.getAllErrors()) {
-                    responseData.getMessages().add(error.getDefaultMessage());
-                }
-                responseData.setStatus(false);
-                responseData.setPayload(null);
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseData);
-            } else {
-                responseData.setStatus(true);
-                responseData.setPayload(userService.update(userResponseData, userOptional.get()));
-                responseData.getMessages().add("Player's data updated");
-                return ResponseEntity.ok(responseData);
+        if (errors.hasErrors()) {
+            for (ObjectError error : errors.getAllErrors()) {
+                responseData.getMessages().add(error.getDefaultMessage());
             }
-
+            responseData.setStatus(false);
+            responseData.setPayload(null);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseData);
+        } else if (userOptional.isPresent()) {
+            responseData.setStatus(true);
+            responseData.setPayload(userService.update(userResponseData, userOptional.get()));
+            responseData.getMessages().add("Player's data updated");
+            return ResponseEntity.ok(responseData);
         } else {
             responseData.setStatus(false);
             responseData.setPayload(null);

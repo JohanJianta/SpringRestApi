@@ -26,7 +26,7 @@ public class HistoryService {
     }
 
     public List<HistoryData> getAllHistory(int idPlayer) {
-        List<History> histories = historyRepository.findTop20DistinctRoomIdsByGuestIdAndShowableTrueOrderByDateDesc(idPlayer);
+        List<History> histories = historyRepository.findTop20HistoriesByGuestIdOrderByDateDesc(idPlayer);
         List<HistoryData> historiesData = new ArrayList<>();
         if (!histories.isEmpty()) {
             for (History history : histories) {
