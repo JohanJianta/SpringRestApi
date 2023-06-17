@@ -7,7 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ObjectError;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -146,7 +145,8 @@ public class GameController {
     }
 
     @PostMapping("/Player")
-    public ResponseEntity<ResponseData<Boolean>> joinRoom(@Valid @RequestBody GamePlayerRequest playerRequest, Errors errors) {
+    public ResponseEntity<ResponseData<Boolean>> joinRoom(@Valid @RequestBody GamePlayerRequest playerRequest,
+            Errors errors) {
         Optional<Game> optionalGame = gameService.getGameById(playerRequest.getGameId());
         Optional<Guest> optionalGuest = guestService.getGuestById(playerRequest.getPlayerId());
         ResponseData<Boolean> responseData = new ResponseData<>();
@@ -160,7 +160,8 @@ public class GameController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseData);
         } else if (optionalGame.isPresent() && optionalGuest.isPresent()) {
             responseData.setStatus(true);
-            responseData.setPayload(gamePlayerService.savePlayer(playerRequest.getPlayerId(), playerRequest.getGameId()));
+            responseData
+                    .setPayload(gamePlayerService.savePlayer(playerRequest.getPlayerId(), playerRequest.getGameId()));
             responseData.getMessages().add("Successfully add player");
             return ResponseEntity.ok().body(responseData);
         } else {
@@ -172,7 +173,8 @@ public class GameController {
     }
 
     @PutMapping("/Player")
-    public ResponseEntity<ResponseData<Boolean>> leaveRoom(@Valid @RequestBody GamePlayerRequest playerRequest, Errors errors) {
+    public ResponseEntity<ResponseData<Boolean>> leaveRoom(@Valid @RequestBody GamePlayerRequest playerRequest,
+            Errors errors) {
         ResponseData<Boolean> responseData = new ResponseData<>();
 
         if (errors.hasErrors()) {
@@ -184,7 +186,8 @@ public class GameController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseData);
         } else if (gamePlayerService.isExist(playerRequest.getPlayerId(), playerRequest.getGameId())) {
             responseData.setStatus(true);
-            responseData.setPayload(gamePlayerService.removePlayer(playerRequest.getPlayerId(), playerRequest.getGameId()));
+            responseData
+                    .setPayload(gamePlayerService.removePlayer(playerRequest.getPlayerId(), playerRequest.getGameId()));
             responseData.getMessages().add("Successfully remove player");
             return ResponseEntity.ok().body(responseData);
         } else {
@@ -195,13 +198,55 @@ public class GameController {
         }
     }
 
+    @PutMapping("/{gameCode}")
+    public ResponseEntity<ResponseData<String>> updateGameroom(@PathVariable(value = "gameCode") int id,
+            @RequestBody String status) {
+        Optional<Game> optionalRoom = gameService.getGameById(id);
+        ResponseData<String> responseData = new ResponseData<>();
+        responseData.setPayload(null);
+
+        if (optionalRoom.isPresent()) {
+
+            RoomStatus roomStatus;
+
+            switch (status) {
+                case "Public":
+                    roomStatus = RoomStatus.Public;
+                    break;
+                case "Private":
+                    roomStatus = RoomStatus.Private;
+                    break;
+                case "Closed":
+                    roomStatus = RoomStatus.Closed;
+                    break;
+                case "Finish":
+                    roomStatus = RoomStatus.Finish;
+                    break;
+                default:
+                    responseData.getMessages().add("Gameroom status is not valid");
+                    responseData.setStatus(false);
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseData);
+            }
+
+            gameService.updateGame(id, roomStatus);
+            responseData.setStatus(true);
+            responseData.getMessages().add("Room's data updated");
+            return ResponseEntity.ok(responseData);
+
+        } else {
+            responseData.setStatus(false);
+            responseData.getMessages().add("Gameroom not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseData);
+        }
+    }
+
     @PutMapping("/Data/{roomCode}")
     public ResponseEntity<ResponseData<RoomResponseData>> updateRoomData(@PathVariable(value = "roomCode") int id,
             @Valid @RequestBody RoomResponseData roomResponseData, Errors errors) {
         Optional<Room> optionalRoom = roomService.getRoomById(id);
+        ResponseData<RoomResponseData> responseData = new ResponseData<>();
 
         if (optionalRoom.isPresent()) {
-            ResponseData<RoomResponseData> responseData = new ResponseData<>();
 
             if (errors.hasErrors()) {
                 for (ObjectError error : errors.getAllErrors()) {
@@ -218,31 +263,38 @@ public class GameController {
             }
 
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            responseData.setStatus(false);
+            responseData.setPayload(null);
+            responseData.getMessages().add("Room not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseData);
         }
     }
 
     // @DeleteMapping("/{gameCode}")
-    // public ResponseEntity<String> disableGameroom(@PathVariable(value = "gameCode") int id) {
-    //     Optional<Game> optionalGame = gameService.getGameById(id);
+    // public ResponseEntity<String> disableGameroom(@PathVariable(value =
+    // "gameCode") int id) {
+    // Optional<Game> optionalGame = gameService.getGameById(id);
 
-    //     if (optionalGame.isPresent()) {
-    //         gameService.finishGame(optionalGame.get());
-    //         return ResponseEntity.ok("Gameroom succesfully deleted");
-    //     } else {
-    //         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error: Gameroom Not Found");
-    //     }
+    // if (optionalGame.isPresent()) {
+    // gameService.finishGame(optionalGame.get());
+    // return ResponseEntity.ok("Gameroom succesfully deleted");
+    // } else {
+    // return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error: Gameroom Not
+    // Found");
+    // }
     // }
 
     // @DeleteMapping("/Data/{roomCode}")
-    // public ResponseEntity<String> deleteRoom(@PathVariable(value = "roomCode") int id) {
-    //     Optional<Room> userOptional = roomService.getRoomById(id);
+    // public ResponseEntity<String> deleteRoom(@PathVariable(value = "roomCode")
+    // int id) {
+    // Optional<Room> userOptional = roomService.getRoomById(id);
 
-    //     if (userOptional.isPresent()) {
-    //         roomService.delete(id);
-    //         return ResponseEntity.ok("Room succesfully deleted");
-    //     } else {
-    //         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error: Room Not Found");
-    //     }
+    // if (userOptional.isPresent()) {
+    // roomService.delete(id);
+    // return ResponseEntity.ok("Room succesfully deleted");
+    // } else {
+    // return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error: Room Not
+    // Found");
+    // }
     // }
 }

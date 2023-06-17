@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.wordle.wordlemania.Entity.GamePlayer;
 import com.wordle.wordlemania.Model.GamePlayerId;
+import com.wordle.wordlemania.Model.RoomStatus;
 import com.wordle.wordlemania.Repos.GamePlayerRepositories;
 
 @Service
@@ -42,7 +43,7 @@ public class GamePlayerService {
         GamePlayerId gamePlayerId = new GamePlayerId(gameId, guestId);
         gamePlayerRepository.deleteById(gamePlayerId);
         if (gamePlayerRepository.countByGameId(gameId) == 0) {
-            gameService.finishGame(gameId);
+            gameService.updateGame(gameId, RoomStatus.Finish);
         }
         return true;
     }

@@ -55,9 +55,9 @@ public class GameService {
         return gameRepository.save(game);
     }
 
-    public void finishGame(int gameId) {
+    public void updateGame(int gameId, RoomStatus status) {
         Game game = gameRepository.findById(gameId).get();
-        game.setStatus(RoomStatus.Finish);
+        game.setStatus(status);
         gameRepository.save(game);
     }
 }

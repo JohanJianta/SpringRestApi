@@ -15,5 +15,5 @@ public interface UserRepositories extends CrudRepository<User, Integer> {
 
     public Optional<User> findByEmail(String email); 
 
-    public List<User> findTop3ByOrderByScoreDescTotalWinDescTotalPlayDesc();
+    public List<User> findTop10ByOrderByScoreDescTotalWinDescTotalPlayDesc();
 }

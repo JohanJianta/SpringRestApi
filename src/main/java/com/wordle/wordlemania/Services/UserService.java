@@ -140,15 +140,15 @@ public class UserService {
     }
 
     public List<UserResponseData> getTopPlayers() {
-        List<User> topPlayers = userRepository.findTop3ByOrderByScoreDescTotalWinDescTotalPlayDesc();
+        List<User> topPlayers = userRepository.findTop10ByOrderByScoreDescTotalWinDescTotalPlayDesc();
         List<UserResponseData> topPlayersData = new ArrayList<>();
         for (User user : topPlayers) {
             UserResponseData userPublic = new UserResponseData();
-            // userPublic.setId(user.getId());
+            userPublic.setUserId(user.getId());
             userPublic.setName(user.getUserGuest().getName());
             userPublic.setScore(user.getScore());
             // userPublic.setTotalPlay(user.getTotalPlay());
-            userPublic.setTotalWin(user.getTotalWin());
+            // userPublic.setTotalWin(user.getTotalWin());
             topPlayersData.add(userPublic);
         }
 
