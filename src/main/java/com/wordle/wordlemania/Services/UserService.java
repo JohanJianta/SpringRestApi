@@ -135,10 +135,6 @@ public class UserService {
         return userDataChanges;
     }
 
-    public void delete(int id) {
-        userRepository.deleteById(id);
-    }
-
     public List<UserResponseData> getTopPlayers() {
         List<User> topPlayers = userRepository.findTop10ByOrderByScoreDescTotalWinDescTotalPlayDesc();
         List<UserResponseData> topPlayersData = new ArrayList<>();
@@ -153,5 +149,25 @@ public class UserService {
         }
 
         return topPlayersData;
+    }
+
+    public List<UserResponseData> get5Random() {
+        List<User> randomPlayers = userRepository.find5RandomUser();
+        List<UserResponseData> randomPlayersData = new ArrayList<>();
+        for (User user : randomPlayers) {
+            UserResponseData userPublic = new UserResponseData();
+            userPublic.setUserId(user.getId());
+            userPublic.setName(user.getUserGuest().getName());
+            userPublic.setScore(user.getScore());
+            userPublic.setTotalPlay(user.getTotalPlay());
+            userPublic.setTotalWin(user.getTotalWin());
+            randomPlayersData.add(userPublic);
+        }
+
+        return randomPlayersData;
+    }
+
+    public void delete(int id) {
+        userRepository.deleteById(id);
     }
 }

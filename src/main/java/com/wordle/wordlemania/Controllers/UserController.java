@@ -117,6 +117,14 @@ public class UserController {
         }
     }
 
+    @GetMapping
+    public ResponseEntity<ResponseData<List<UserResponseData>>> findRandomPlayer() {
+        ResponseData<List<UserResponseData>> responseData = new ResponseData<>();
+        responseData.setStatus(true);
+        responseData.setPayload(userService.get5Random());
+        return ResponseEntity.ok().body(responseData);
+    }
+
     @GetMapping("/{idPlayer}")
     public ResponseEntity<ResponseData<UserResponseData>> findUser(@PathVariable(value = "idPlayer") int id) {
         Optional<User> userOptional = userService.getUserById(id);
